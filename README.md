@@ -29,43 +29,51 @@
 
 ## 快速开始
 
-### 方式一：直接运行（需要本机已安装 .NET 5 Runtime）
+### 编译
 
-编译后从输出目录启动：
-
-```powershell
-cd TempMate\bin\Release\net5.0-windows
-.\TempMate.exe
-```
-
-或直接用仓库里的 `build.ps1` 一键编译：
+仓库提供 `build.ps1` 一键编译（框架依赖、单文件发布）：
 
 ```powershell
 .\build.ps1
-# 产物：publish\TempMate.exe
+# 产物目录 publish\
+#   TempMate.exe          主程序（需 .NET 8 Desktop Runtime）
+#   TempMate.Launcher.cmd 环境检测启动器
 ```
 
-### 方式二：自包含发布（无需安装运行库）
-
-适合发给没装 .NET 5 的电脑：
+如需手动编译：
 
 ```powershell
-dotnet publish TempMate\TempMate.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
+dotnet publish TempMate\TempMate.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
 ```
 
-发布完成后，`publish\TempMate.exe` 即为单文件可执行程序。
+### 运行
 
-### 分发给他人的推荐方式：启动器（环境自检）
+- 已安装 .NET 8 Desktop Runtime：直接双击 `TempMate.exe`，或通过 `TempMate.Launcher.cmd` 启动。
+- 未安装运行时：双击 `TempMate.Launcher.cmd`，按提示跳转官网下载安装后重试。
 
-框架依赖版 `TempMate.exe` 在目标电脑**缺少 .NET 8 Desktop Runtime** 时无法自行提示（CLR 加载失败，托管代码不会执行）。为此提供了 `TempMate.Launcher.cmd`：
+### 分发给他人
 
-- 启动前先检测 `C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\8.0*` 是否存在；
-- 已安装 → 直接拉起 `TempMate.exe`；
-- 未安装 → 弹出提示框（英文），点击 **Yes** 即跳转官方下载页 <https://dotnet.microsoft.com/download/dotnet/8.0>。
+将 `publish\` 目录下的 `TempMate.exe` 与 `TempMate.Launcher.cmd` 一并打包即可。对方双击启动器：已安装运行时则直接运行，未安装则提示跳转官方下载页。
 
-> 注意：启动器使用纯 ASCII 批处理，避免中文编码在不同编辑器/系统代码页下乱码。提示语为英文，不影响功能。
+### （可选）自包含发布
 
-**所以把 TempMate 发给别人时，请连同 `TempMate.Launcher.cmd` 一起给，并让对方双击启动器即可。** 你自己本机已装 .NET 5，直接双击 `TempMate.exe` 也没问题。
+若目标机器完全没有 .NET 运行时、且不方便安装，可打成自包含单文件（体积约 100 MB 以上）：
+
+```powershell
+dotnet publish TempMate\TempMate.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish-self
+```
+
+发布完成后，`publish-self\TempMate.exe` 即为不依赖运行时的单文件可执行程序。
+
+### 启动器说明
+
+框架依赖版 `TempMate.exe` 在目标电脑**缺少 .NET 8 Desktop Runtime** 时无法自行提示（CLR 加载失败，托管代码不会执行）。`TempMate.Launcher.cmd` 在拉起程序前先做环境自检：
+
+- 检测 `C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\8.0*` 是否存在；
+- 已安装 → 直接运行 `TempMate.exe`；
+- 未安装 → 弹出提示框，点击 **Yes** 跳转官方下载页 <https://dotnet.microsoft.com/download/dotnet/8.0>。
+
+> 启动器使用纯 ASCII 批处理，避免中文编码在不同编辑器 / 系统代码页下乱码；提示语为英文，不影响功能。
 
 ## 项目结构
 
@@ -80,7 +88,7 @@ TempMate/
 ├── TECH.md
 ├── overview.md
 └── TempMate/
-    ├── TempMate.csproj      # 项目文件（.NET 5 Windows Forms）
+    ├── TempMate.csproj      # 项目文件（.NET 8 Windows Forms）
     ├── Program.cs           # 程序入口，单实例互斥体 + 全局异常日志
     ├── AppConfig.cs         # 配置读写（JSON）
     ├── TemperatureMonitor.cs# 温度监控核心（LibreHardwareMonitor 封装）
