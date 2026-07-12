@@ -24,6 +24,11 @@ namespace TempMate
 
         private readonly List<DisplayItem> _items = new();
 
+        private ToolStripMenuItem? _topMostMenuItem;
+        private ToolStripMenuItem? _passThroughMenuItem;
+        private ToolStripMenuItem? _lockMenuItem;
+        private ToolStripMenuItem? _opacityMenuItem;
+
         // 视觉常量
         private const int CARD_RADIUS = 12;
         private const int CARD_PAD_H = 14;
@@ -136,31 +141,31 @@ namespace TempMate
             var settingsItem = new ToolStripMenuItem("设置");
             settingsItem.Click += (_, _) => OpenSettings();
 
-            var topMostItem = new ToolStripMenuItem("总是置顶") { Checked = _config.TopMost };
-            topMostItem.Click += (_, _) =>
+            _topMostMenuItem = new ToolStripMenuItem("总是置顶") { Checked = _config.TopMost };
+            _topMostMenuItem.Click += (_, _) =>
             {
                 _config.TopMost = !_config.TopMost;
-                topMostItem.Checked = _config.TopMost;
+                _topMostMenuItem.Checked = _config.TopMost;
                 ApplyConfig();
             };
 
-            var passThroughItem = new ToolStripMenuItem("鼠标穿透") { Checked = _config.MousePassThrough };
-            passThroughItem.Click += (_, _) =>
+            _passThroughMenuItem = new ToolStripMenuItem("鼠标穿透") { Checked = _config.MousePassThrough };
+            _passThroughMenuItem.Click += (_, _) =>
             {
                 _config.MousePassThrough = !_config.MousePassThrough;
-                passThroughItem.Checked = _config.MousePassThrough;
+                _passThroughMenuItem.Checked = _config.MousePassThrough;
                 ApplyConfig();
             };
 
-            var lockItem = new ToolStripMenuItem("锁定窗口位置") { Checked = _config.LockPosition };
-            lockItem.Click += (_, _) =>
+            _lockMenuItem = new ToolStripMenuItem("锁定窗口位置") { Checked = _config.LockPosition };
+            _lockMenuItem.Click += (_, _) =>
             {
                 _config.LockPosition = !_config.LockPosition;
-                lockItem.Checked = _config.LockPosition;
+                _lockMenuItem.Checked = _config.LockPosition;
                 ApplyConfig();
             };
 
-            var opacityMenu = new ToolStripMenuItem("窗口不透明度");
+            _opacityMenuItem = new ToolStripMenuItem("窗口不透明度");
             foreach (int pct in new[] { 100, 75, 50, 25 })
             {
                 int local = pct;
@@ -169,9 +174,9 @@ namespace TempMate
                 {
                     _config.OpacityPercent = local;
                     ApplyConfig();
-                    UpdateOpacityMenu(opacityMenu);
+                    UpdateOpacityMenu(_opacityMenuItem);
                 };
-                opacityMenu.DropDownItems.Add(item);
+                _opacityMenuItem.DropDownItems.Add(item);
             }
 
             var exitItem = new ToolStripMenuItem("退出");
@@ -179,20 +184,29 @@ namespace TempMate
 
             menu.Items.Add(settingsItem);
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add(topMostItem);
-            menu.Items.Add(passThroughItem);
-            menu.Items.Add(lockItem);
-            menu.Items.Add(opacityMenu);
+            menu.Items.Add(_topMostMenuItem);
+            menu.Items.Add(_passThroughMenuItem);
+            menu.Items.Add(_lockMenuItem);
+            menu.Items.Add(_opacityMenuItem);
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add(exitItem);
 
             ContextMenuStrip = menu;
         }
 
-        private void UpdateOpacityMenu(ToolStripMenuItem opacityMenu)
+        private void UpdateOpacityMenu(ToolStripMenuItem? opacityMenu)
         {
+            if (opacityMenu == null) return;
             foreach (ToolStripMenuItem item in opacityMenu.DropDownItems)
                 item.Checked = item.Text == $"{_config.OpacityPercent}%";
+        }
+
+        private void RefreshContextMenuState()
+        {
+            if (_topMostMenuItem != null) _topMostMenuItem.Checked = _config.TopMost;
+            if (_passThroughMenuItem != null) _passThroughMenuItem.Checked = _config.MousePassThrough;
+            if (_lockMenuItem != null) _lockMenuItem.Checked = _config.LockPosition;
+            UpdateOpacityMenu(_opacityMenuItem);
         }
 
         #endregion
@@ -486,6 +500,7 @@ namespace TempMate
             {
                 ApplyConfig();
                 PositionWindow();
+                RefreshContextMenuState();
             }
             _updateTimer.Start();
         }
