@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 5
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '5.0.x'
+
+      - name: Restore
+        run: dotnet restore TempMate/TempMate.csproj
+
+      - name: Build
+        run: dotnet build TempMate/TempMate.csproj -c Release --no-restore
+
+      - name: Publish framework-dependent single-file
+        run: dotnet publish TempMate/TempMate.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish --no-build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TempMate-win-x64
+          path: |
+            publish/TempMate.exe
+            publish/TempMate.Launcher.cmd
+            publish/*.dll
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: TempMate-win-x64
+          path: publish
+
+      - name: Create release zip
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Compress-Archive -Path publish/* -DestinationPath dist/TempMate-win-x64.zip -Force
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/TempMate-win-x64.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

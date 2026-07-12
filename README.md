@@ -31,15 +31,25 @@
 
 ### 方式一：直接运行（需要本机已安装 .NET 5 Runtime）
 
+编译后从输出目录启动：
+
 ```powershell
 cd TempMate\bin\Release\net5.0-windows
 .\TempMate.exe
 ```
 
-### 方式二：自包含发布（无需安装运行库）
+或直接用仓库里的 `build.ps1` 一键编译：
 
 ```powershell
-cd F:\ZB_GithubSelf\TempMate
+.\build.ps1
+# 产物：publish\TempMate.exe
+```
+
+### 方式二：自包含发布（无需安装运行库）
+
+适合发给没装 .NET 5 的电脑：
+
+```powershell
 dotnet publish TempMate\TempMate.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish
 ```
 
@@ -61,18 +71,23 @@ dotnet publish TempMate\TempMate.csproj -c Release -r win-x64 --self-contained t
 
 ```
 TempMate/
+├── .gitignore
 ├── TempMate.sln
-├── TempMate/
-│   ├── TempMate.csproj      # 项目文件（.NET 5 Windows Forms）
-│   ├── Program.cs           # 程序入口，单实例互斥体 + 全局异常日志
-│   ├── AppConfig.cs         # 配置读写（JSON）
-│   ├── TemperatureMonitor.cs# 温度监控核心（LibreHardwareMonitor 封装）
-│   ├── MainForm.cs          # 悬浮窗主界面
-│   ├── SettingsForm.cs      # 设置对话框
-│   └── app.manifest         # DPI 感知与管理员相关声明
+├── TempMate.ico
+├── TempMate.Launcher.cmd   # 环境检测启动器（分发用）
+├── build.ps1               # 一键编译脚本
 ├── README.md
 ├── TECH.md
-└── overview.md
+├── overview.md
+└── TempMate/
+    ├── TempMate.csproj      # 项目文件（.NET 5 Windows Forms）
+    ├── Program.cs           # 程序入口，单实例互斥体 + 全局异常日志
+    ├── AppConfig.cs         # 配置读写（JSON）
+    ├── TemperatureMonitor.cs# 温度监控核心（LibreHardwareMonitor 封装）
+    ├── MainForm.cs          # 悬浮窗主界面
+    ├── SettingsForm.cs      # 设置对话框
+    ├── StartupHelper.cs     # 开机自启动注册表管理
+    └── app.manifest         # DPI 感知与管理员相关声明
 ```
 
 > 依赖通过 NuGet 包 `LibreHardwareMonitorLib` 0.9.0 引入（详见 `TECH.md` 第 4 节），
