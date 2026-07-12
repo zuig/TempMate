@@ -27,7 +27,7 @@ jobs:
         run: dotnet build TempMate/TempMate.csproj -c Release --no-restore
 
       - name: Publish framework-dependent single-file
-        run: dotnet publish TempMate/TempMate.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish --no-build
+        run: dotnet publish TempMate/TempMate.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
