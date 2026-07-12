@@ -230,9 +230,7 @@ namespace TempMate
 
         private void PositionWindow()
         {
-            Screen targetScreen = (_config.UseSecondaryScreen && Screen.AllScreens.Length > 1)
-                ? Screen.AllScreens[1]
-                : (Screen.PrimaryScreen ?? Screen.AllScreens[0]);
+            Screen targetScreen = FindTargetScreen();
 
             if (_config.WindowX != int.MinValue && _config.WindowY != int.MinValue)
             {
@@ -247,6 +245,29 @@ namespace TempMate
             Rectangle workArea = targetScreen.WorkingArea;
             Location = new Point(workArea.Right - Width - 6, workArea.Bottom - Height - 6);
             SavePosition();
+        }
+
+        private Screen FindTargetScreen()
+        {
+            Screen[] screens = Screen.AllScreens;
+            if (screens.Length == 0) return Screen.PrimaryScreen ?? throw new InvalidOperationException("No screens available");
+
+            // 1. 按具体显示器名称匹配
+            if (!string.IsNullOrEmpty(_config.SelectedScreen))
+            {
+                foreach (var s in screens)
+                {
+                    if (s.DeviceName.Equals(_config.SelectedScreen, StringComparison.OrdinalIgnoreCase))
+                        return s;
+                }
+            }
+
+            // 2. 兼容旧版配置：UseSecondaryScreen 为 true 且有多屏时，使用 AllScreens[1]
+            if (_config.UseSecondaryScreen && screens.Length > 1)
+                return screens[1];
+
+            // 3. 默认主显示器
+            return Screen.PrimaryScreen ?? screens[0];
         }
 
         private void SavePosition()

@@ -65,7 +65,8 @@ Win32_DiskDrive
 | `LockPosition` | 是否禁止拖拽 |
 | `OpacityPercent` | 不透明度百分比 |
 | `DriveLetter` | 监控的硬盘盘符 |
-| `UseSecondaryScreen` | 是否在副屏显示 |
+| `SelectedScreen` | 指定显示器的 DeviceName（为空时使用主显示器） |
+| `UseSecondaryScreen` | 旧版兼容字段：是否在副屏显示 |
 | `WindowX` / `WindowY` | 窗口位置 |
 
 ## 3. 构建说明
@@ -73,7 +74,7 @@ Win32_DiskDrive
 ### 环境要求
 
 - Windows 10/11
-- [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0)（本机只有 .NET 5 SDK，因此项目目标框架选用了 `net5.0-windows`）
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)（项目目标框架为 `net8.0-windows`）
 
 ### 编译
 
