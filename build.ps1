@@ -1,7 +1,7 @@
 # TempMate one-click build script
 # Produces a single-file, FRAMEWORK-DEPENDENT win-x64 executable (~few MB).
-# Requires the .NET 5 Desktop Runtime to be installed on the target PC.
-# (Your dev PC already has it via the .NET 5 SDK, so it runs here directly.)
+# Requires the .NET 8 Desktop Runtime to be installed on the target PC.
+# (Your dev PC already has it via the .NET 8 SDK, so it runs here directly.)
 #
 # Usage (run in PowerShell from the project root):
 #   powershell -ExecutionPolicy Bypass -File build.ps1
@@ -52,14 +52,14 @@ if (Test-Path $exe) {
     Write-Host "[OK] Build succeeded."
     Write-Host "     Output: $exe"
     Write-Host "     Size  : $mb MB"
-    Write-Host "     Requires .NET 5 Desktop Runtime on the target PC."
+    Write-Host "     Requires .NET 8 Desktop Runtime on the target PC."
 
-    # 5. 附带启动器（缺失 .NET 5 时给出友好提示并打开下载页）
+    # 5. 附带启动器（缺失 .NET 8 时给出友好提示并打开下载页）
     $launcherSrc = Join-Path $ScriptDir "TempMate.Launcher.cmd"
     $launcherDst = Join-Path $ScriptDir "publish\TempMate.Launcher.cmd"
     if (Test-Path $launcherSrc) {
         Copy-Item -Force $launcherSrc $launcherDst
-        Write-Host "     Launcher: $launcherDst  (用于分发给未装 .NET 5 的电脑)"
+        Write-Host "     Launcher: $launcherDst  (用于分发给未装 .NET 8 的电脑)"
     }
 } else {
     Write-Host "[FAIL] publish/TempMate.exe was not produced."

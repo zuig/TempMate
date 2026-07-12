@@ -24,7 +24,7 @@
 ## 运行环境
 
 - Windows 10 / Windows 11
-- .NET 5.0 运行时（已安装 [.NET 5 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/5.0) 的系统可直接运行 `TempMate.exe`）
+- .NET 8.0 运行时（已安装 [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) 的系统可直接运行 `TempMate.exe`）
 - 若双击无反应，请查看程序所在目录下的 `crash.log` 获取错误栈
 
 ## 快速开始
@@ -57,11 +57,11 @@ dotnet publish TempMate\TempMate.csproj -c Release -r win-x64 --self-contained t
 
 ### 分发给他人的推荐方式：启动器（环境自检）
 
-框架依赖版 `TempMate.exe` 在目标电脑**缺少 .NET 5 Desktop Runtime** 时无法自行提示（CLR 加载失败，托管代码不会执行）。为此提供了 `TempMate.Launcher.cmd`：
+框架依赖版 `TempMate.exe` 在目标电脑**缺少 .NET 8 Desktop Runtime** 时无法自行提示（CLR 加载失败，托管代码不会执行）。为此提供了 `TempMate.Launcher.cmd`：
 
-- 启动前先检测 `C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\5.0*` 是否存在；
+- 启动前先检测 `C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\8.0*` 是否存在；
 - 已安装 → 直接拉起 `TempMate.exe`；
-- 未安装 → 弹出提示框（英文），点击 **Yes** 即跳转官方下载页 <https://dotnet.microsoft.com/download/dotnet/5.0>。
+- 未安装 → 弹出提示框（英文），点击 **Yes** 即跳转官方下载页 <https://dotnet.microsoft.com/download/dotnet/8.0>。
 
 > 注意：启动器使用纯 ASCII 批处理，避免中文编码在不同编辑器/系统代码页下乱码。提示语为英文，不影响功能。
 
