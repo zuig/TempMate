@@ -84,8 +84,6 @@ TempMate/
 ├── TempMate.Launcher.cmd   # 环境检测启动器（分发用）
 ├── build.ps1               # 一键编译脚本
 ├── README.md
-├── TECH.md
-├── overview.md
 └── TempMate/
     ├── TempMate.csproj      # 项目文件（.NET 8 Windows Forms）
     ├── Program.cs           # 程序入口，单实例互斥体 + 全局异常日志
