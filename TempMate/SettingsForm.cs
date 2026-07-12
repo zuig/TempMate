@@ -16,7 +16,6 @@ namespace TempMate
         private CheckBox _chkLockPosition = null!;
         private ComboBox _cmbOpacity = null!;
         private ComboBox _cmbDrive = null!;
-        private ComboBox _cmbScreen = null!;
         private CheckBox _chkStartWithWindows = null!;
         private Button _btnOk = null!;
         private Button _btnCancel = null!;
@@ -56,9 +55,7 @@ namespace TempMate
 
             int maxLabelWidth = Math.Max(
                 TextRenderer.MeasureText("窗口不透明度：", Font).Width,
-                Math.Max(
-                    TextRenderer.MeasureText("监控硬盘：", Font).Width,
-                    TextRenderer.MeasureText("显示屏幕：", Font).Width));
+                TextRenderer.MeasureText("监控硬盘：", Font).Width);
             int comboX = x + maxLabelWidth + 12;
 
             var lblOpacity = new Label
@@ -90,21 +87,6 @@ namespace TempMate
             };
             y += 44;
 
-            var lblScreen = new Label
-            {
-                Text = "显示屏幕：",
-                Location = new Point(x, y + 3),
-                AutoSize = true
-            };
-            _cmbScreen = new ComboBox
-            {
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Location = new Point(comboX, y),
-                Width = ClientSize.Width - comboX - 24
-            };
-            PopulateScreenList();
-            y += 40;
-
             _chkStartWithWindows = CreateCheckBox("开机自启动", x, y);
             y += 32;
 
@@ -132,8 +114,6 @@ namespace TempMate
             Controls.Add(_cmbOpacity);
             Controls.Add(lblDrive);
             Controls.Add(_cmbDrive);
-            Controls.Add(lblScreen);
-            Controls.Add(_cmbScreen);
             Controls.Add(_chkStartWithWindows);
             Controls.Add(_btnOk);
             Controls.Add(_btnCancel);
@@ -194,51 +174,6 @@ namespace TempMate
             }
         }
 
-        private void PopulateScreenList()
-        {
-            _cmbScreen.Items.Clear();
-            Screen[] screens = Screen.AllScreens;
-            for (int i = 0; i < screens.Length; i++)
-            {
-                var s = screens[i];
-                bool isPrimary = s.Primary;
-                string display = $"{s.DeviceName}  {(isPrimary ? "[主显示器]" : "")}  {s.Bounds.Width}x{s.Bounds.Height}";
-                _cmbScreen.Items.Add(new ScreenItem(s.DeviceName, display));
-            }
-
-            // 默认选中已保存的显示器；没有保存则选中主显示器
-            string target = _config.SelectedScreen;
-            if (string.IsNullOrEmpty(target))
-            {
-                target = Screen.PrimaryScreen?.DeviceName ?? "";
-            }
-
-            for (int i = 0; i < _cmbScreen.Items.Count; i++)
-            {
-                if (_cmbScreen.Items[i] is ScreenItem item &&
-                    item.DeviceName.Equals(target, StringComparison.OrdinalIgnoreCase))
-                {
-                    _cmbScreen.SelectedIndex = i;
-                    return;
-                }
-            }
-
-            if (_cmbScreen.Items.Count > 0)
-                _cmbScreen.SelectedIndex = 0;
-        }
-
-        private sealed class ScreenItem
-        {
-            public string DeviceName { get; }
-            public string DisplayText { get; }
-            public ScreenItem(string deviceName, string displayText)
-            {
-                DeviceName = deviceName;
-                DisplayText = displayText;
-            }
-            public override string ToString() => DisplayText;
-        }
-
         private void PopulateDriveList(List<HardDriveInfo> drives)
         {
             _cmbDrive.Items.Clear();
@@ -287,12 +222,6 @@ namespace TempMate
             if (opacityText != null && int.TryParse(opacityText.TrimEnd('%'), out int opacity))
             {
                 _config.OpacityPercent = opacity;
-            }
-
-            // 保存选中的显示器
-            if (_cmbScreen.SelectedItem is ScreenItem screenItem)
-            {
-                _config.SelectedScreen = screenItem.DeviceName;
             }
 
             string? driveText = _cmbDrive.SelectedItem?.ToString();

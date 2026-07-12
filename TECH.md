@@ -65,8 +65,6 @@ Win32_DiskDrive
 | `LockPosition` | 是否禁止拖拽 |
 | `OpacityPercent` | 不透明度百分比 |
 | `DriveLetter` | 监控的硬盘盘符 |
-| `SelectedScreen` | 指定显示器的 DeviceName（为空时使用主显示器） |
-| `UseSecondaryScreen` | 旧版兼容字段：是否在副屏显示 |
 | `WindowX` / `WindowY` | 窗口位置 |
 
 ## 3. 构建说明

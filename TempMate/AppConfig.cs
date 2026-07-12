@@ -22,19 +22,6 @@ namespace TempMate
         public string DriveLetter { get; set; } = "";
         public int WindowX { get; set; } = int.MinValue;
         public int WindowY { get; set; } = int.MinValue;
-
-        /// <summary>
-        /// 指定要显示窗口的屏幕 DeviceName（如 \\.\DISPLAY2）。
-        /// 为空时默认使用主显示器。
-        /// </summary>
-        public string SelectedScreen { get; set; } = "";
-
-        /// <summary>
-        /// 旧版配置中的"副屏显示"开关（保留兼容）。
-        /// 仅在 SelectedScreen 为空时作为降级策略使用。
-        /// </summary>
-        public bool UseSecondaryScreen { get; set; } = false;
-
         public bool StartWithWindows { get; set; } = false;
 
         /// <summary>
