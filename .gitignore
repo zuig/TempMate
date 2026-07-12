@@ -1,0 +1,28 @@
+# ---- Build output ----
+[Bb]in/
+[Oo]bj/
+publish/
+publish-standalone/
+publish_clean/
+publish_test/
+
+# ---- Visual Studio ----
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ---- Rider / VSCode ----
+.idea/
+.vscode/
+
+# ---- Build / debug artifacts ----
+*.pdb
+*.sys
+crash.log
+
+# ---- OS ----
+Thumbs.db
+Desktop.ini
+.DS_Store
