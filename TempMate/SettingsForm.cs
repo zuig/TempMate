@@ -107,6 +107,15 @@ namespace TempMate
 
             _btnOk.Click += BtnOk_Click;
 
+            var lblVersion = new Label
+            {
+                Text = GetVersionText(),
+                Location = new Point(x, y + 8),
+                AutoSize = true,
+                ForeColor = Color.Gray,
+                Font = new Font(Font.FontFamily, 8.25F)
+            };
+
             Controls.Add(_chkTopMost);
             Controls.Add(_chkMousePassThrough);
             Controls.Add(_chkLockPosition);
@@ -115,6 +124,7 @@ namespace TempMate
             Controls.Add(lblDrive);
             Controls.Add(_cmbDrive);
             Controls.Add(_chkStartWithWindows);
+            Controls.Add(lblVersion);
             Controls.Add(_btnOk);
             Controls.Add(_btnCancel);
 
@@ -135,6 +145,12 @@ namespace TempMate
                 Location = new Point(x, y),
                 AutoSize = true
             };
+        }
+
+        private static string GetVersionText()
+        {
+            var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            return ver != null ? $"v{ver.Major}.{ver.Minor}.{ver.Build}" : string.Empty;
         }
 
         private async void SettingsForm_Load(object? sender, EventArgs e)

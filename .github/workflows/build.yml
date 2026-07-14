@@ -20,14 +20,25 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Determine version
+        id: ver
+        shell: pwsh
+        run: |
+          if ("${{ github.ref }}" -like "refs/tags/v*") {
+            $v = "${{ github.ref_name }}".Substring(1)
+            "args=-p:Version=$v -p:FileVersion=$v.0 -p:AssemblyVersion=$v.0" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          } else {
+            "args=" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          }
+
       - name: Restore
         run: dotnet restore TempMate/TempMate.csproj
 
       - name: Build
-        run: dotnet build TempMate/TempMate.csproj -c Release --no-restore
+        run: dotnet build TempMate/TempMate.csproj -c Release --no-restore ${{ steps.ver.outputs.args }}
 
       - name: Publish framework-dependent single-file
-        run: dotnet publish TempMate/TempMate.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish
+        run: dotnet publish TempMate/TempMate.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o publish ${{ steps.ver.outputs.args }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
