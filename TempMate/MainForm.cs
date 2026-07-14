@@ -244,30 +244,16 @@ namespace TempMate
 
         private void PositionWindow()
         {
-            Screen targetScreen = Screen.PrimaryScreen ?? Screen.AllScreens[0];
-            Rectangle workArea = targetScreen.WorkingArea;
-
-            // 优先使用相对工作区右下角的偏移。这样即使任务栏高度、DPI 或窗口大小变化，
-            // 窗口也能保持在相同的"右下角锚点"位置。
-            if (_config.RightOffset >= 0 && _config.BottomOffset >= 0)
+            // 有记录：直接按记录的右下角锚点摆放，不重新计算
+            if (_config.AnchorRight != int.MinValue && _config.AnchorBottom != int.MinValue)
             {
-                int x = workArea.Right - _config.RightOffset - Width;
-                int y = workArea.Bottom - _config.BottomOffset - Height;
-                Location = new Point(x, y);
+                Location = new Point(_config.AnchorRight - Width, _config.AnchorBottom - Height);
                 return;
             }
 
-            // 旧版兼容：使用保存的绝对坐标
-            if (_config.WindowX != int.MinValue && _config.WindowY != int.MinValue)
-            {
-                var restored = new Rectangle(_config.WindowX, _config.WindowY, Width, Height);
-                if (Screen.FromRectangle(restored) != null)
-                {
-                    Location = new Point(_config.WindowX, _config.WindowY);
-                    return;
-                }
-            }
-
+            // 无记录：首次计算一次默认位置（主屏工作区右下角），并保存
+            Screen targetScreen = Screen.PrimaryScreen ?? Screen.AllScreens[0];
+            Rectangle workArea = targetScreen.WorkingArea;
             Location = new Point(workArea.Right - Width - 6, workArea.Bottom - Height - 6);
             SavePosition();
         }
@@ -276,13 +262,12 @@ namespace TempMate
         {
             if (_isDragging || _config.LockPosition) return;
 
-            Screen screen = Screen.FromControl(this) ?? (Screen.PrimaryScreen ?? Screen.AllScreens[0]);
-            Rectangle workArea = screen.WorkingArea;
-
+            // 记录窗口右下角的绝对屏幕坐标作为锚点。
+            // 窗口宽度会随温度数值变化，用右下角锚点可保证视觉位置稳定。
+            _config.AnchorRight = Right;
+            _config.AnchorBottom = Bottom;
             _config.WindowX = Location.X;
             _config.WindowY = Location.Y;
-            _config.RightOffset = workArea.Right - (Location.X + Width);
-            _config.BottomOffset = workArea.Bottom - (Location.Y + Height);
             _config.Save();
         }
 
@@ -351,12 +336,21 @@ namespace TempMate
             int w = Math.Max(totalW, 80);
             int h = CARD_PAD_V * 2 + DIVIDER_H + 4;
 
-            int right = Right;
-            int bottom = Bottom;
-            Width = w;
-            Height = h;
             if (!_config.LockPosition && !_isDragging)
-                Location = new Point(right - Width, bottom - Height);
+            {
+                // 以记录的右下角锚点为准重新摆放；宽度变化时向左伸展，视觉位置保持不变。
+                // 无记录时退化为当前右下角。
+                int anchorRight = _config.AnchorRight != int.MinValue ? _config.AnchorRight : Right;
+                int anchorBottom = _config.AnchorBottom != int.MinValue ? _config.AnchorBottom : Bottom;
+                Width = w;
+                Height = h;
+                Location = new Point(anchorRight - Width, anchorBottom - Height);
+            }
+            else
+            {
+                Width = w;
+                Height = h;
+            }
 
             // Win10 下通过 Region 裁剪出圆角；Win11 由 DWM 原生处理。
             if (!IsWindows11())

@@ -24,16 +24,16 @@ namespace TempMate
         public int WindowY { get; set; } = int.MinValue;
 
         /// <summary>
-        /// 窗口右侧到工作区右边缘的偏移（像素）。
-        /// 负数表示未设置，使用绝对位置 WindowX/WindowY 回退。
+        /// 记录的窗口右边缘绝对屏幕坐标（像素）。
+        /// int.MinValue 表示尚无记录，此时才需要计算一次默认位置。
         /// </summary>
-        public int RightOffset { get; set; } = -1;
+        public int AnchorRight { get; set; } = int.MinValue;
 
         /// <summary>
-        /// 窗口底部到工作区底边缘的偏移（像素）。
-        /// 负数表示未设置，使用绝对位置 WindowX/WindowY 回退。
+        /// 记录的窗口下边缘绝对屏幕坐标（像素）。
+        /// int.MinValue 表示尚无记录，此时才需要计算一次默认位置。
         /// </summary>
-        public int BottomOffset { get; set; } = -1;
+        public int AnchorBottom { get; set; } = int.MinValue;
 
         public bool StartWithWindows { get; set; } = false;
 
