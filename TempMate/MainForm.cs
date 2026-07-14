@@ -245,7 +245,19 @@ namespace TempMate
         private void PositionWindow()
         {
             Screen targetScreen = Screen.PrimaryScreen ?? Screen.AllScreens[0];
+            Rectangle workArea = targetScreen.WorkingArea;
 
+            // 优先使用相对工作区右下角的偏移。这样即使任务栏高度、DPI 或窗口大小变化，
+            // 窗口也能保持在相同的"右下角锚点"位置。
+            if (_config.RightOffset >= 0 && _config.BottomOffset >= 0)
+            {
+                int x = workArea.Right - _config.RightOffset - Width;
+                int y = workArea.Bottom - _config.BottomOffset - Height;
+                Location = new Point(x, y);
+                return;
+            }
+
+            // 旧版兼容：使用保存的绝对坐标
             if (_config.WindowX != int.MinValue && _config.WindowY != int.MinValue)
             {
                 var restored = new Rectangle(_config.WindowX, _config.WindowY, Width, Height);
@@ -256,7 +268,6 @@ namespace TempMate
                 }
             }
 
-            Rectangle workArea = targetScreen.WorkingArea;
             Location = new Point(workArea.Right - Width - 6, workArea.Bottom - Height - 6);
             SavePosition();
         }
@@ -264,8 +275,14 @@ namespace TempMate
         private void SavePosition()
         {
             if (_isDragging || _config.LockPosition) return;
+
+            Screen screen = Screen.FromControl(this) ?? (Screen.PrimaryScreen ?? Screen.AllScreens[0]);
+            Rectangle workArea = screen.WorkingArea;
+
             _config.WindowX = Location.X;
             _config.WindowY = Location.Y;
+            _config.RightOffset = workArea.Right - (Location.X + Width);
+            _config.BottomOffset = workArea.Bottom - (Location.Y + Height);
             _config.Save();
         }
 

@@ -22,6 +22,19 @@ namespace TempMate
         public string DriveLetter { get; set; } = "";
         public int WindowX { get; set; } = int.MinValue;
         public int WindowY { get; set; } = int.MinValue;
+
+        /// <summary>
+        /// 窗口右侧到工作区右边缘的偏移（像素）。
+        /// 负数表示未设置，使用绝对位置 WindowX/WindowY 回退。
+        /// </summary>
+        public int RightOffset { get; set; } = -1;
+
+        /// <summary>
+        /// 窗口底部到工作区底边缘的偏移（像素）。
+        /// 负数表示未设置，使用绝对位置 WindowX/WindowY 回退。
+        /// </summary>
+        public int BottomOffset { get; set; } = -1;
+
         public bool StartWithWindows { get; set; } = false;
 
         /// <summary>
